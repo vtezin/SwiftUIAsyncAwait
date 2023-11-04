@@ -8,14 +8,18 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State private var showDataLoader = false
+    
     var body: some View {
         VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundColor(.accentColor)
-            Text("Hello, world!")
+            Button("Show data loader") {
+                showDataLoader = true
+            }
         }
         .padding()
+        .sheet(isPresented: $showDataLoader) {
+            DataLoaderView()
+        }
     }
 }
 
