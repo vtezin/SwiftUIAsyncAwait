@@ -79,6 +79,7 @@ struct IdentifiableImage: Identifiable {
 
 extension ImageLoader {
     static let testURLS = [URL(string: "https://www.fund4dogs.ru/wp-content/uploads/2024/06/1000097411-1.jpg")!,
-                           URL(string: "https://cs11.pikabu.ru/post_img/2019/02/04/12/1549312329147951618.jpg")!]
+                           URL(string: "https://cs11.pikabu.ru/post_img/2019/02/04/12/1549312329147951618.jpg")!,
+                           URL(string: "https://static.rozetked.me/imager/main/images/uploads/dwoilp3BVjlE.webp")!]
     
 }

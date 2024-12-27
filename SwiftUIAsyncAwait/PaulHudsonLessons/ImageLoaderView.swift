@@ -13,12 +13,16 @@ struct ImageLoaderView: View {
     
     var body: some View {
         List {
-            if imageLoader.inProgress {
-                ProgressView("Loading...")
-            }
-            
             Button("\(counter)") {
                 counter += 1
+            }
+            
+            if imageLoader.inProgress {
+                HStack {
+                    ProgressView()
+                    Spacer()
+                    Text("\(imageLoader.images.count) loaded")
+                }
             }
             
             ForEach(imageLoader.images) { image in
