@@ -43,7 +43,7 @@ struct IdentifiableImage: Identifiable {
         images.removeAll()
         
         for url in urls {
-            Task.detached {
+            Task {
                 let result = await self.loadImageFromURL(url: url)
                 switch result {
                 case .success(let image):

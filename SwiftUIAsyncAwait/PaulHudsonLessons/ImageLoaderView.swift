@@ -9,11 +9,16 @@ import SwiftUI
 
 struct ImageLoaderView: View {
     @State private var imageLoader = ImageLoader()
+    @State private var counter = 0
     
     var body: some View {
         List {
             if imageLoader.inProgress {
                 ProgressView("Loading...")
+            }
+            
+            Button("\(counter)") {
+                counter += 1
             }
             
             ForEach(imageLoader.images) { image in
