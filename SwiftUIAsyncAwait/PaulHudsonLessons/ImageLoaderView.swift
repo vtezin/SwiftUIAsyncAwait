@@ -12,44 +12,24 @@ struct ImageLoaderView: View {
     
     var body: some View {
         List {
-            Section("Single image") {
-                switch imageLoader.state {
-                case .idle:
-                    Text("Idle")
-                case .loading:
-                    ProgressView()
-                case .loaded(let image):
-                    image
-                        .resizable()
-                        .scaledToFit()
-                case .failed(let error):
-                    Text("Error: \(error)")
-                }
-                
-                Button("Load") {
-                    Task {
-                        await imageLoader.loadImage(url: ImageLoader.testURLS.first!)
-                    }
+            if imageLoader.inProgress {
+                ProgressView("Loading...")
+            }
+            
+            ForEach(imageLoader.images) { image in
+                image.image
+                    .resizable()
+                    .scaledToFit()
+            }
+            Button("Load consistently") {
+                Task {
+                    await imageLoader.loadImagesСonsistently(urls: ImageLoader.testURLS)
                 }
             }
             
-            
-            Section("Multiple images") {
-                ForEach(imageLoader.images) { image in
-                    image.image
-                        .resizable()
-                        .scaledToFit()
-                }
-                Button("Load consistently") {
-                    Task {
-                        await imageLoader.loadImagesСonsistently(urls: ImageLoader.testURLS)
-                    }
-                }
-                
-                Button("Load parallel") {
-                    Task {
-                        await imageLoader.loadImagesParallel(urls: ImageLoader.testURLS)
-                    }
+            Button("Load parallel") {
+                Task {
+                    await imageLoader.loadImagesParallel(urls: ImageLoader.testURLS)
                 }
             }
         }

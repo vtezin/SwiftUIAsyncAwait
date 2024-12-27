@@ -12,35 +12,17 @@ enum LoadError: Error {
     case fetchFailed, decodeFailed
 }
 
-enum LoadingState {
-    case idle
-    case loading
-    case loaded(Image)
-    case failed(Error)
-}
-
 struct IdentifiableImage: Identifiable {
     let id = UUID()
     let image: Image
 }
 
 @Observable final class ImageLoader {
-    var state: LoadingState = .idle
+    var inProgress = false
     var images = [IdentifiableImage]()
     
-    func loadImage(url: URL) async {
-        state = .loading
-        let result = await loadImageFromURL(url: url)
-        switch result {
-        case .success(let image):
-            state = .loaded(image)
-        case .failure(let error):
-            state = .failed(error)
-        }
-    }
-    
     func loadImagesСonsistently(urls: [URL]) async {
-        state = .loading
+        inProgress = true
         images.removeAll()
         
         for url in urls {
@@ -53,28 +35,31 @@ struct IdentifiableImage: Identifiable {
             }
         }
         
-        state = .idle
+        inProgress = false
     }
     
+    @MainActor
     func loadImagesParallel(urls: [URL]) async {
-        state = .loading
+        inProgress = true
         images.removeAll()
         
         for url in urls {
-            async let result = loadImageFromURL(url: url)
-            switch await result {
-            case .success(let image):
-                images.append(IdentifiableImage(image: image))
-            case .failure(let error):
-                print("failure \(error)")
+            Task.detached {
+                let result = await self.loadImageFromURL(url: url)
+                switch result {
+                case .success(let image):
+                    self.images.append(IdentifiableImage(image: image))
+                case .failure(let error):
+                    print("failure \(error)")
+                }
             }
         }
         
-        state = .idle
+        inProgress = false
     }
     
-    private func loadImageFromURL(url: URL) async -> Result<Image, Error> {
-        try? await Task.sleep(for: .seconds(3))
+    private func loadImageFromURL(url: URL, sleepSeconds: Int = 1) async -> Result<Image, Error> {
+        try? await Task.sleep(for: .seconds(sleepSeconds))
         let downloadTask = Task {
             do {
                 let (data, _) = try await URLSession.shared.data(from: url)
