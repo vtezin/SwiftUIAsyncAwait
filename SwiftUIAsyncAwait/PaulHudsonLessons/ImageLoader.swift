@@ -38,7 +38,6 @@ struct IdentifiableImage: Identifiable {
         inProgress = false
     }
     
-    @MainActor
     func loadImagesParallel(urls: [URL]) async {
         inProgress = true
         images.removeAll()
@@ -52,13 +51,14 @@ struct IdentifiableImage: Identifiable {
                 case .failure(let error):
                     print("failure \(error)")
                 }
+                if self.images.count == urls.count {
+                    self.inProgress = false
+                }
             }
         }
-        
-        inProgress = false
     }
     
-    private func loadImageFromURL(url: URL, sleepSeconds: Int = 1) async -> Result<Image, Error> {
+    private func loadImageFromURL(url: URL, sleepSeconds: Int = 2) async -> Result<Image, Error> {
         try? await Task.sleep(for: .seconds(sleepSeconds))
         let downloadTask = Task {
             do {
